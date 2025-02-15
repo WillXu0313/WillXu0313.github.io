@@ -103,9 +103,11 @@ sudo docker run hello-world
 
 2. 在文档里添加如下内容，可以多加几个镜像源，国内不太稳定。（至于如何添加——insert，然后退出保存：w，：q）
 
-   ```
-   { 
-   "registry-mirrors": ["https://alzgoonw.mirror.aliyuncs.com"] 
+   ```json
+   {
+       "registry-mirrors": [
+       	"https://docker.registry.cyou"
+       ]
    }
    ```
 

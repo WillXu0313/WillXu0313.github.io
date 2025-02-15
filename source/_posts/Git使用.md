@@ -303,7 +303,75 @@ eg：现在有test.py和test.go两个文件，都分别被commit到本地仓库�
    README.md  test.go  test.py
    ```
 
-   
+
+## 合并提交
+
+`git rebase -i HEAD~3`或者`git rebase -i 51efaef517abdbf674478de6073c12239d78a56a` （第一个commit的id）将会将三个提交压缩为一个提交。
+
+提交后会跳出交互界面供修改：
+
+```
+pick 1234567 第一次提交的描述信息
+pick 2345678 第二次提交的描述信息
+pick 3456789 第三次提交的描述信息
+
+# Rebase 4567890..3456789 onto 4567890 (3 commands)
+#
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup <commit> = like "squash", but discard this commit's log message
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+# .       create a merge commit using the original merge commit's
+# .       message (or the oneline, if no original merge commit was
+# .       specified). Use -c <commit> to reword the commit message.
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+```
+
+### 交互界面命令说明
+
+```plaintext
+# Commands:
+# p, pick <commit> = use commit
+# r, reword <commit> = use commit, but edit the commit message
+# e, edit <commit> = use commit, but stop for amending
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup <commit> = like "squash", but discard this commit's log message
+# x, exec <command> = run command (the rest of the line) using shell
+# b, break = stop here (continue rebase later with 'git rebase --continue')
+# d, drop <commit> = remove commit
+# l, label <label> = label current HEAD with a name
+# t, reset <label> = reset HEAD to a label
+# m, merge [-C <commit> | -c <commit>] <label> [# <oneline>]
+# .       create a merge commit using the original merge commit's
+# .       message (or the oneline, if no original merge commit was
+# .       specified). Use -c <commit> to reword the commit message.
+```
+
+这部分是对可用命令的说明，常用命令解释如下：
+
+- **`pick (p)`**：使用该提交，不做任何修改。
+- **`reword (r)`**：使用该提交，但允许你编辑提交信息。
+- **`edit (e)`**：使用该提交，但在处理到该提交时暂停，允许你对该提交进行修改（如添加或删除文件）。
+- **`squash (s)`**：将该提交合并到前一个提交中，合并后会让你编辑合并后的提交信息。
+- **`fixup (f)`**：类似于 `squash`，但会丢弃该提交的日志信息，直接使用前一个提交的信息。
+- **`drop (d)`**：删除该提交记录。
+
+现在用的到的是将第一条提交打p，后面的提交都打s，这样会让我编辑决定合并后的提交信息。
 
 # Git配置
 
