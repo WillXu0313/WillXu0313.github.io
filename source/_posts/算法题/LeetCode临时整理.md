@@ -2,6 +2,8 @@
 title: LeetCode临时整理
 date: 2025-01-25 07:49:30
 tags: LeetCode
+categories:
+- Algorithm
 ---
 
 # LeetCode刷题记录

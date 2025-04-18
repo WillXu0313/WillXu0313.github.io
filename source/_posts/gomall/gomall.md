@@ -341,7 +341,7 @@ registry:
 
 ### 编写客户端代码发现proto服务
 
-创建`cmd/client/main.go`，和官网示例还是冲突。很关键在于引入自定义的`demo_proto`下两个包，这是客户端和请求的定义。
+创建`cmd/client/main.go`，很关键在于引入自定义的`demo_proto`下两个包，这是客户端和请求的定义。
 
 ```go
 package main
@@ -866,3 +866,7 @@ c.HTML(consts.StatusOK, "home.tmpl", resp)
 - [hertz-contrib/jwt](https://www.cloudwego.io/zh/docs/hertz/tutorials/basic-feature/middleware/jwt/)
 - [hertz-contrib/paseto](https://www.cloudwego.io/zh/docs/hertz/tutorials/basic-feature/middleware/paseto/)：比jwt更安全昂
 - [hertz-contrib/keyauth](https://www.cloudwego.io/zh/docs/hertz/tutorials/basic-feature/middleware/keyauth/)
+
+
+
+现在看当初跟着视频的记录，写的什么玩意，看都看不懂

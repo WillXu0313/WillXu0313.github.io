@@ -9,6 +9,61 @@ categories:
 
 此笔记是根据`progit`提炼出来的Git基本使用操作，后续可能还会根据日常使用增删内容。
 
+# Git配置
+
+## 双配置
+
+双配置意思是对Gitee和Github分别生成SSH密钥对，两个密钥对相互独立，互不干扰，但是其实用同一个密钥对问题也不大。
+
+1. 生成新的用于 Gitee 的 SSH 密钥对：
+
+   ```
+   ssh-keygen -t rsa -f C:\Users\许伟强\.ssh\id_rsa_gitee -C "2629162585@qq.com"
+   ```
+
+2. 生成新的用于 GitHub 的 SSH 密钥对：
+
+   ```
+   ssh-keygen -t rsa -f C:\Users\许伟强\.ssh\id_rsa_github -C "2629162585@qq.com"
+   ```
+
+3. 配置 SSH 配置文件：
+
+   在 `~/.ssh` 目录下创建一个名为 `config` 的文件（如果不存在），并在其中添加以下内容：
+
+   ```
+   # Gitee
+   Host gitee.com
+   HostName gitee.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_gitee
+   
+   # GitHub
+   Host github.com
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_github
+   ```
+
+4. 将生成的 Gitee 的公钥添加到 Gitee 中：
+
+   打开 Gitee 网站，进入个人设置，找到 SSH 公钥相关设置，将 `~/.ssh/id_rsa_gitee.pub` 文件中的内容粘贴进去。
+
+5. 将生成的 GitHub 的公钥添加到 GitHub 中：
+
+   打开 GitHub 网站，进入设置页面，找到 SSH and GPG keys 选项，将 `~/.ssh/id_rsa_github.pub` 文件中的内容粘贴进去。
+
+6. 测试连接：
+
+   分别执行以下命令测试与 Gitee 和 GitHub 的连接：
+
+   ```
+   ssh -T git@gitee.com
+   ssh -T git@github.com
+   ```
+
+
+
 # Git概念
 
 Git是个分布式版本控制工具，支持多人协同，可以保存和管理不同版本的记录。
@@ -214,6 +269,14 @@ $ git commit --amend
 
 在 Git 中任何 **已提交** 的东西几乎总是可以恢复的。然而，任何你未提交的东西丢失后很可能再也找不到了。
 
+ `"git checkout <commitId> -- <file_path_to_rep>..."`将（多个）文件回退到commitId对用的版本
+
+撤销git commit --amend
+
+```
+git reset HEAD@{1} 
+```
+
 ### 恢复文件
 
 将工作区某个文件恢复到上次提交或暂存（如果有暂存就恢复到暂存，否则是恢复到提交的），但是如果有删除操作被放到暂存区的话会报错哦
@@ -373,60 +436,189 @@ pick 3456789 第三次提交的描述信息
 
 现在用的到的是将第一条提交打p，后面的提交都打s，这样会让我编辑决定合并后的提交信息。
 
-# Git配置
+采用当前操作的日期
 
-## 双配置
+```
+git rebase -i <base-commit> --committer-date-is-author-date
+```
 
-双配置意思是对Gitee和Github分别生成SSH密钥对，两个密钥对相互独立，互不干扰，但是其实用同一个密钥对问题也不大。
+# 日常使用
 
-1. 生成新的用于 Gitee 的 SSH 密钥对：
+## 代码同步
 
-   ```
-   ssh-keygen -t rsa -f C:\Users\许伟强\.ssh\id_rsa_gitee -C "2629162585@qq.com"
-   ```
+在某个本地分支上，丢弃本地状态，强制同步本地到仓库版本
 
-2. 生成新的用于 GitHub 的 SSH 密钥对：
+```
+git fetch --all && git reset --hard origin/<分支> 
+```
 
-   ```
-   ssh-keygen -t rsa -f C:\Users\许伟强\.ssh\id_rsa_github -C "2629162585@qq.com"
-   ```
+```
+git fetch --origin && git reset --hard origin/adapter-5.3.0
+```
 
-3. 配置 SSH 配置文件：
+切换到远程仓库分支，head 会 detach
 
-   在 `~/.ssh` 目录下创建一个名为 `config` 的文件（如果不存在），并在其中添加以下内容：
+```
+git fetch --origin && git checkout origin/<分支>
+```
 
-   ```
-   # Gitee
-   Host gitee.com
-   HostName gitee.com
-   User git
-   IdentityFile ~/.ssh/id_rsa_gitee
-   
-   # GitHub
-   Host github.com
-   HostName github.com
-   User git
-   IdentityFile ~/.ssh/id_rsa_github
-   ```
+## 创建分支
 
-4. 将生成的 Gitee 的公钥添加到 Gitee 中：
+```
+git checkout -b <new-branch-name>
+```
 
-   打开 Gitee 网站，进入个人设置，找到 SSH 公钥相关设置，将 `~/.ssh/id_rsa_gitee.pub` 文件中的内容粘贴进去。
+## 切换分支前丢弃冲突
 
-5. 将生成的 GitHub 的公钥添加到 GitHub 中：
+强制删除未跟踪的目录和文件，然后切换分支
 
-   打开 GitHub 网站，进入设置页面，找到 SSH and GPG keys 选项，将 `~/.ssh/id_rsa_github.pub` 文件中的内容粘贴进去。
+```
+git clean -fd
+git checkout origin/5.3.0
+```
 
-6. 测试连接：
+## 推送远程没有的分支
 
-   分别执行以下命令测试与 Gitee 和 GitHub 的连接：
+当前分支 adapter-5.3.0 没有对应的上游分支，为推送当前分支并建立与远程上游的跟踪，使用
 
-   ```
-   ssh -T git@gitee.com
-   ssh -T git@github.com
-   ```
+```
+git push --set-upstream origin adapter-5.3.0
+```
 
-   
+## **对比两个提交并列出不同的文件**
 
+只列出名字
 
+```
+git diff --name-only <commit-hash-1> <commit-hash-2>
+```
+
+| 需求                           | 命令                                           |
+| ------------------------------ | ---------------------------------------------- |
+| 列出不同文件                   | `git diff --name-only <commit-1> <commit-2>`   |
+| 查看详细差异                   | `git diff <commit-1> <commit-2>`               |
+| 统计改动数量                   | `git diff --stat <commit-1> <commit-2>`        |
+| 显示改动类型（新增/修改/删除） | `git diff --name-status <commit-1> <commit-2>` |
+
+## 终止合并
+
+```
+git merge --abort
+```
+
+## IDEA图形化界面合并提交
+
+https://blog.csdn.net/yuec1998/article/details/118460431
+
+## 修改分支名称
+
+在本地分支
+
+```
+# 切换到目标分支
+git checkout feature-old
+
+# 重命名分支
+git branch -m feature-new
+```
+
+对远程
+
+```
+# 删除远程旧分支
+git push origin --delete feature-old
+
+# 推送新分支到远程
+git push origin feature-new
+
+# 设置新分支为默认上游分支
+git branch --set-upstream-to=origin/feature-new
+```
+
+## git-alias
+
+使用别名提高效率，但是没有尝试，目前已经在终端配置了别名
+
+Git Pro：https://git-scm.com/book/zh/v2/Git-%E5%9F%BA%E7%A1%80-Git-%E5%88%AB%E5%90%8D
+
+https://zhuanlan.zhihu.com/p/52806571
+
+## LF转换（无用）
+
+在Win上我的Git自己会转换换行符。目前IDEA同步代码会出现较多的问题，LF、文件修改
+
+- LF：
+
+  **转换单个文件**
+
+  使用 `dos2unix` 命令直接转换指定的文件：
+
+  ```
+  dos2unix guesttools/src/main/java/org/zstack/guesttools/APIGetGuestVmScriptExecutedRecordAndDetailMsg.java
+  ```
+
+  **批量转换多个文件**
+
+  如果你需要转换整个目录下的所有文件，可以结合 `find` 命令一起使用：
+
+  ```
+  find . -type f -print0 | xargs -0 dos2unix
+  ```
+
+  这会递归地查找当前目录及其子目录下所有文件，并将它们从 DOS/Windows 格式转换为 Unix 格式。
+
+- 文件修改：
+
+  可能需要手动比较不同文件的修改，手动restore回退
+
+## 修改时间
+
+```
+# 修改上次提交日期为当前时间
+git commit --amend --no-edit --date "now"
+```
+
+## 切换远程仓库
+
+```
+git remote set-url origin http://dev.zstack.io:9080/jin.shen/zstack-utility.git
+git fetch origin
+```
+
+## 项目内邮箱和用户名设置
+
+```
+PS D:\zstack\cloud\zstack-utility> git config user.name "weiqiang.xu"
+PS D:\zstack\cloud\zstack-utility> git config user.email "weiqiang.xu@zstack.io"
+```
+
+```
+PS D:\zstack\cloud\zstack-utility> git config --local --list
+core.repositoryformatversion=0
+core.filemode=false
+core.bare=false
+core.logallrefupdates=true
+core.symlinks=false
+core.ignorecase=true
+remote.origin.url=http://dev.zstack.io:9080/jin.shen/zstack-utility.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+remote.upstream.url=http://dev.zstack.io:9080/zstackio/zstack-utility.git
+remote.upstream.fetch=+refs/heads/*:refs/remotes/upstream/*
+branch.metadata-5.3.0-ZSTACK-74105@@2.remote=origin
+branch.metadata-5.3.0-ZSTACK-74105@@2.merge=refs/heads/metadata-5.3.0-ZSTACK-74105@@2
+branch.adapter-ZSTAC-73178@@3.remote=origin
+branch.adapter-ZSTAC-73178@@3.merge=refs/heads/adapter-ZSTAC-73178@@3
+branch.ZSTAC-71896.remote=origin
+branch.ZSTAC-71896.merge=refs/heads/ZSTAC-71896
+user.name=weiqiang.xu
+user.email=weiqiang.xu@zstack.io
+```
+
+## 修改上次提交的作者信息
+
+```
+git commit --amend --reset-author --no-edit
+```
 
